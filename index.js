@@ -2,26 +2,30 @@ const steamUser = require('steam-user');
 const steamTotp = require('steam-totp');
 const keep_alive = require('./keep_alive.js')
 
-const RateLimit = require('express-rate-limit');
+const logInToSteamAccount = (username, password, shared_secret, games, status) => {
+  const user = new steamUser();
+  user.logOn({"accountName": username, "password": password, "twoFactorCode": steamTotp.generateAuthCode(shared_secret)});
+  user.on('loggedOn', () => {
+    if (user.steamID != null) console.log(user.steamID + ' - Successfully logged on');
+    user.setPersona(status);               
+    user.gamesPlayed(games);
 
-var limiter = new RateLimit({
-  windowMs: 5*60*1000, // 5 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  delayMs: 0 // disable delaying - full speed until the max limit is reached
-});
+    // Listen for log out event
+    user.on('disconnected', () => {
+      console.log('Logged out');
+    });
+  });
 
-var username = process.env.username;
-var password = process.env.password;
-var shared_secret = process.env.shared;
+  // Function to log out
+  const logOut = () => {
+    user.logOff();
+  }
 
-var games = [730, 271590, 2073850, 1085660, 346110];  // Enter here AppIDs of the needed games
-var status = 1;  // 1 - online, 7 - invisible
+  return logOut;
+}
 
-const user = new steamUser();
-user.use(limiter); // applying rate limit
-user.logOn({"accountName": username, "password": password, "twoFactorCode": steamTotp.generateAuthCode(shared_secret)});
-user.on('loggedOn', () => {
-	if (user.steamID != null) console.log(user.steamID + ' - Successfully logged on');
-	user.setPersona(status);               
-	user.gamesPlayed(games);
-});
+const username1 = process.env.username;
+const password1 = process.env.password;
+const shared_secret1 = process.env.shared;
+const games1 = [730, 271590, 2073850, 1085660, 346110];
+const status1 = 1;
