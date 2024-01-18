@@ -15,7 +15,7 @@ const logInToSteamAccount = (username, password, shared_secret, games, status) =
 const username1 = process.env.username;
 const password1 = process.env.password;
 const shared_secret1 = process.env.shared;
-const games1 = [730, 271590, 2073850, 1085660, 346110];
+const games1 = [730, 578080, 2073850, 1085660, 346110, 1245620, 550];
 const status1 = 1;
 
 logInToSteamAccount(username1, password1, shared_secret1, games1, status1);
